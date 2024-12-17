@@ -22,6 +22,31 @@ app.get("/", (req, res) => {
 
 app.post("/", () => {
   console.log("post");
+
+  let studentSchema = mongoose.Schema({
+    name: String,
+    age: Number,
+    height: Number,
+  });
+
+  let Student = mongoose.model("students", studentSchema);
+
+  let newStudent = req.body;
+
+  let student = new Student({ newStudent });
+
+  student
+    .save()
+    .then(() => {
+      res.json({
+        message: "new student saved successfully",
+      });
+    })
+    .catch(() => {
+      res.json({
+        message: "error saving student",
+      });
+    });
 });
 
 app.listen(port, () => {
