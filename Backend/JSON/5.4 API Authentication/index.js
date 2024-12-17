@@ -9,7 +9,7 @@ const API_URL = "https://secrets-api.appbrewery.com/";
 const yourUsername = "kavinduf2";
 const yourPassword = "hellobunny";
 const yourAPIKey = "1fb933e9-2217-4eec-92a2-1a833c3196d2";
-const yourBearerToken = "87d8a592-6be1-4b3c-a97d-f4f0bffa3f06";
+const yourBearerToken = "6530fdad-941f-4f98-a873-e25cb412b7e6";
 
 app.get("/", (req, res) => {
   res.render("index.ejs", { content: "API Response." });
@@ -56,18 +56,39 @@ app.get("/basicAuth", async (req, res) => {
 
       const result = response.data
 
-    }catch{
+      if(result){
+        res.render("index.ejs", { content: JSON.stringify(result) });
+      }
 
+    }catch (error) {
+      console.error("Failed to make request:", error.message);
     }
 });
 
-app.get("/apiKey", (req, res) => {
+app.get("/apiKey", async (req, res) => {
   //TODO 4: Write your code here to hit up the /filter endpoint
   //Filter for all secrets with an embarassment score of 5 or greater
   //HINT: You need to provide a query parameter of apiKey in the request.
+  try{
+    const response = await axios.get(`${API_URL}filter?`, {
+      params: {
+        apiKey: yourAPIKey,
+        score: 5,
+      },
+    })
+
+    let result = response.data;
+
+    if(result){
+      res.render('index.ejs', {content: JSON.stringify(result)});
+    }
+
+  }catch (error) {
+    console.error("Failed to make request:", error.message);
+  }
 });
 
-app.get("/bearerToken", (req, res) => {
+app.get("/bearerToken", async (req, res) => {
   //TODO 5: Write your code here to hit up the /secrets/{id} endpoint
   //and get the secret with id of 42
   //HINT: This is how you can use axios to do bearer token auth:
@@ -79,6 +100,23 @@ app.get("/bearerToken", (req, res) => {
     },
   });
   */
+
+  try{
+    let response = await axios.get(`${API_URL}secrets/42`, {
+      headers: {
+        Authorization: `Bearer ${yourBearerToken}`,
+      }
+    })
+
+    let result = response.data;
+
+    if(result){
+      res.render('index.ejs', {content: JSON.stringify(result)});
+    }
+
+  }catch (error){
+    console.error("Failed to make request:", error.message);
+  }
 });
 
 app.listen(port, () => {
