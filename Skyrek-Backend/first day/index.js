@@ -1,54 +1,26 @@
 import express from "express";
-import bodyParser from "body-parser";
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
+import studentRouter from "./routes/studentRoute.js";
 
 const port = 3000;
+const app = express();
 
-let mongoURL =
-  "mongodb+srv://admin:admin@cluster0.487de.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+// Middleware
+app.use(express.json());
 
-mongoose.connect(mongoURL);
+// MongoDB Connection
+const mongoURL =
+  "mongodb+srv://admin:admin@cluster0.487de.mongodb.net/yourDatabaseName?retryWrites=true&w=majority";
 
-let connection = mongoose.connection;
-connection.once("open", () => {
-  console.log("mongodb connection successful");
-});
+mongoose
+  .connect(mongoURL, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("MongoDB connection successful"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
-let app = express();
+// Routes
+app.use("/students", studentRouter);
 
-app.get("/", (req, res) => {
-  console.log("request sent");
-});
-
-app.post("/", () => {
-  console.log("post");
-
-  let studentSchema = mongoose.Schema({
-    name: String,
-    age: Number,
-    height: Number,
-  });
-
-  let Student = mongoose.model("students", studentSchema);
-
-  let newStudent = req.body;
-
-  let student = new Student({ newStudent });
-
-  student
-    .save()
-    .then(() => {
-      res.json({
-        message: "new student saved successfully",
-      });
-    })
-    .catch(() => {
-      res.json({
-        message: "error saving student",
-      });
-    });
-});
-
+// Server Start
 app.listen(port, () => {
-  console.log(`server is listening on port ${port}`);
+  console.log(`Server is listening on port ${port}`);
 });
