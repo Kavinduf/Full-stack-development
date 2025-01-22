@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
+import studentRouter from "./routes/studentRoute.js";
 const app = express();
 const port = 3000;
 
@@ -16,42 +17,7 @@ connection.once("open", () => {
   console.log("Connected to DB");
 });
 
-app.get("/", (req, res) => {
-  console.log("Get request");
-  res.json({ message: "Good Morning" + req.body.name });
-});
-
-app.post("/", (req, res) => {
-  let studentSchema = mongoose.Schema({
-    name: String,
-    age: Number,
-    height: Number,
-  });
-
-  let Student = mongoose.model("student", studentSchema);
-  // modelname and JSON structure
-  let newStudent = req.body;
-
-  let student = new Student(newStudent);
-
-  student
-    .save()
-    .then(() => {
-      res.json({
-        Message: "Student saved successfully",
-      });
-    })
-    .catch(() => {
-      res.json({
-        Message: "Student could not be saved",
-      });
-    });
-});
-
-app.delete("/", (req, res) => {
-  console.log("Delete Request");
-  req.json({ message: "This is delete" });
-});
+app.use("/students", studentRouter);
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
